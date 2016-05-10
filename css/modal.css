@@ -1,108 +1,122 @@
 /* The Modal (background) */
 .modal {
-    display: block; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    padding-top: 100px; /* Location of the box */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-    /*font-family: sans-serif;*/
+	display: block; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 1; /* Sit on top */
+	padding-top: 65px; /* Location of the box */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgb(0,0,0); /* Fallback color */
+	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+	font-family: inherit;
 }
 
 /* Modal Content */
 .modal-content {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    display: table;
+	background-color: #fefefe;
+	margin: auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%;
+	display: table;
 }
 .modal-content p {
 	display: inline-block;
 }
 .modal-content aside {
-    display: inline-block;
-    float: right;
-    margin: 38px auto;
-    padding: 20px;
+	display: inline-block;
+	float: right;
+	margin: 38px auto;
+	padding: 20px;
 }
 
 /* The Close Button */
 .close {
-    color: #777;
-    float: right;
-    font-size: 26px;
-    font-weight: bold;
-    text-shadow: 3px 1px 4px #ccc;
+	color: #777;
+	float: right;
+	font-size: 26px;
+	font-weight: bold;
+	text-shadow: 3px 1px 4px #ccc;
 }
 
 .close:hover,
 .close:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
+	color: #000;
+	text-decoration: none;
+	cursor: pointer;
 }
 .modal-content input {
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
-    color: #555;
-    display: block;
-    height: 34px;
-    line-height: 1.42857;
-    padding: 6px 12px;
-    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
-    width: 100%;
+	background-color: #fff;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+	color: #555;
+	display: block;
+	height: 34px;
+	line-height: 1.42857;
+	padding: 6px 12px;
+	transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+	width: 100%;
 }
 .modal-content input:focus {
-  border-color: #666;
-  outline: 0;
-  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px #ddd;
-          box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px #ddd;
+	border: none;
+	outline: 0;
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px #3c763d;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px #3c763d;
 }
 .modal-content input::-moz-placeholder {
-  color: #999;
-  opacity: 1;
+	color: #999;
+	opacity: 1;
 }
 .modal-content input:-ms-input-placeholder {
-  color: #999;
+	color: #999;
 }
 .modal-content input::-webkit-input-placeholder {
-  color: #999;
+	color: #999;
 }
 .modal-content label{
-  display: inline-block;
-  padding: .6em;
-  font-weight: bold;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: .25em;
+	display: inline-block;
+	padding: .6em;
+	font-weight: bold;
+	line-height: 1;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: baseline;
+	border-radius: .25em;
 }
 .modal-content .help-block {
-  display: block;
-  margin-top: 5px;
-  margin-bottom: 10px;
-  color: #737373;
+	display: block;
+	margin-top: 5px;
+	margin-bottom: 10px;
+	color: #737373;
 }
 #resultDiv.results {
-    border-color: #3c763d;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #67b168;
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #67b168;
-    margin: 10px auto;
-    padding: 20px;
+	border-color: #3c763d;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #3c763d;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #3c763d;
+	margin: 10px auto;
+	padding: 20px;
+	transition: all 0.5s ease-in-out 0s;
 }
 hr {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  border: 0;
-  border-top: 1px solid #c9e2b3;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	border: 0;
+	border-top: 1px solid #c9e2b3;
 }
+
+.col-6 {
+	display: inline-block;
+	padding: 10px;
+	position: relative;
+	width: 48%;
+}
+
+.modal .modal-content ul{
+	line-height: 1.5em;
+	list-style-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/4621/treehouse-marker.png);
+}
+.text-center{text-align: center;}
