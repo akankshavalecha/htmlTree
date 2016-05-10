@@ -1,5 +1,5 @@
 
-//  Tree for for dom tree that includes Node constructor
+//  Tree for for dom tree that points to root
 function Tree(){
   this._root = null;
 }
