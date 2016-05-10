@@ -68,6 +68,7 @@ Hashtable.prototype.setHashTables = function(node){
   
 };
 
+
 // process the query list and return type of query: comma based seperation or space based
 Hashtable.prototype.cleanQuery = function(query){
   //  we have to check whether its a (comma seperated id) query or space seperated
@@ -194,40 +195,51 @@ var $f = function(query){
 
 
 
+// create modal over html to represent the html tree 
+function createModal(tree){
+  // Get the modal
+  var modal = document.createElement('div');
+  modal.id = 'tree_modal';
+  modal.className = 'modal';
+  document.body.appendChild(modal);
+  // Now create modal-content and append to modal
+  var modal_content = document.createElement('div');
+  modal.appendChild(modal_content);
 
-function createModal(n){
-// Get the modal
-var modal = document.createElement('div');
-modal.id = 'tree_modal';
-modal.className = 'modal';
-document.body.appendChild(modal);
-  // Now create and append to iDiv
-  var innerDiv = document.createElement('div');
-  innerDiv.className = 'modal-content';
-  // The variable iDiv is still good... Just append to it.
+  modal_content.className = 'modal-content';
 
-
+  // close span is created and append to modal-content to close modal
   var sp = document.createElement('span');
   sp.className = 'close' ;
   sp.innerHTML = 'X';
   sp.title = 'Close';
-  innerDiv.appendChild(sp);
+  modal_content.appendChild(sp);
 
+  // modal header is created and append to modal-content
   var modal_header = document.createElement('h2');
   modal_header.innerHTML = "HTML Tree Modal"+ "<hr>";
   modal_header.className = 'text-center';
-  innerDiv.appendChild(modal_header);
+  modal_content.appendChild(modal_header);
 
-  var p = document.createElement('p');
-  p.className = 'col-6';
-  // recursion into a tree
+  // modal content is divided into two columns to show tree and aside search nodes column
+  var first_column = document.createElement('div');
+  first_column.className = 'col-6';
+  // ul is created and append to first column of modal-content to show tree
   var treehtml = document.createElement('ul');
-  createTreeHTML(n, treehtml);
-  p.appendChild(treehtml);
-  innerDiv.appendChild(p);
+
+  // tree method is called to get html format of tree
+  tree.createTreeHTML(tree._root, treehtml);
+  // tree is append to first_column of modal-content
+  first_column.appendChild(treehtml);
+
+  // first column is appended to modal-content
+  modal_content.appendChild(first_column);
 
   // aside for search tags, id, classes
   var aside = document.createElement('aside');
+  // aside is appended to modal_content
+  modal_content.appendChild(aside);
+
   aside.className = 'col-6 modal-aside';
   // creating label for input
   var label = document.createElement('label');
@@ -238,21 +250,24 @@ document.body.appendChild(modal);
   var inputs = document.createElement('input');
   inputs.type = 'text';
   inputs.name = 'search';
-  inputs.id = 'search-input';
+  inputs.id = 'search_input';
   inputs.placeholder = 'Enter to search';
+  // onkeyup event look up for enter key
   inputs.addEventListener("keyup", function(e){
     if(e.keyCode === 13){
+      // on hit enter search query and show results
       showSearchResult(this.value);
     }
   });
+  // input is append to aside of modal content
   aside.appendChild(inputs);
 
   // creating help text for classes, id, and tags
   var help = document.createElement('p');
   help.className = 'help-block';
-  help.innerHTML = "Press Enter to search <br>Use tags to search by tags, eg: <i>div</i> <br> \
-  Use ' # ' to search tags by id, eg: <i> #header </i> \
-  <br> Use: ' . ' to search by class, eg: <i>.main-header</i> <br>"
+  help.innerHTML = "Press Enter to search <br>Use tags to search by tags, eg: <i><u>div</u> </i> or <i><u>div, a</u></i> <br> \
+  Use ' # ' to search tags by id, eg: <i><u> #header </u></i> or <i><u>#header, #footer</u></i>\
+  <br> Use: ' . ' to search by class, eg: <i><u>.main-header</u></i> or <i><u>.btn, .logo</u></i> <br>"
   aside.appendChild(help);
 
   // creatiing a result div for input search 
@@ -263,11 +278,8 @@ document.body.appendChild(modal);
   resultDiv.id = 'resultDiv';
   resultDiv.innerHTML = 'No Results';
   resultDiv.className = 'results';
+  // result div is appended to aside
   aside.appendChild(resultDiv);
-
-  innerDiv.appendChild(aside);
-
-  modal.appendChild(innerDiv);
 
 
   // When the user clicks on <span> (x), close the modal
@@ -283,49 +295,17 @@ document.body.appendChild(modal);
     }
   }
 
-}
-
-var createTreeHTML = function(rootnode, treehtml) {
-  var li = document.createElement('li');
-  // span for tag node name
-  var name_span = document.createElement('span');
-  name_span.title = 'Tag';
-  name_span.innerHTML = rootnode.nodeName;
-  li.appendChild(name_span);
-  // span for id
-  var id = rootnode.id ? '<b>#</b>' + rootnode.id : '';
-  var name_span = document.createElement('span');
-  name_span.title = 'Id';
-  name_span.innerHTML = id;
-  li.appendChild(name_span);
-  // span for class
-  var className = rootnode.classList.length ? '<b>.</b>'+ rootnode.classList.join('.') : '';
-  var name_span = document.createElement('span');
-  name_span.title = 'Class';
-  name_span.innerHTML = className;
-  li.appendChild(name_span);
-  
-  // append li in the html
-  treehtml.appendChild(li);
-  if(rootnode.children.length){
-    var subtree = document.createElement('ul');
-    li.appendChild(subtree);
-    for (var i = 0, length = rootnode.children.length; i < length; i++) {
-      createTreeHTML(rootnode.children[i], subtree)
-    }
-  }
-  else{
-    return true;
-  }
-
 };
+
+
 
 var showSearchResult = function(query){
   var res = $f(query);
     var resultDiv = document.getElementById('resultDiv');
     resultDiv.innerHTML = '';
     resultDiv.className = 'results';
-
+    // res is a object of array when query is for class or tag
+    // res is a object of node when query is for id
     for(item in res){
       if(res[item]){
         if(Array.isArray(res[item])){
@@ -377,7 +357,7 @@ var print = function(o){
   return outerD.innerHTML;
 };
 
-
+// a tree method: to create nodes and children and by using recursion, creating a tree
 Tree.prototype.createNodesTree = function(domNode){
   // new node is created using DOM element
   var newNode = new Node(domNode);
@@ -391,23 +371,68 @@ Tree.prototype.createNodesTree = function(domNode){
     child.parent = newNode; // set parent to child node
     newNode.addChildren(child); // node addChildren method is called to add child
   }
+  // it is required to set hashtable maps while the children nodes are building
   hashtable.setHashTables(newNode);
- return newNode; // finally node is returned
+  return newNode; // finally node is returned
 }
 
+// creates a tree structure as html tree
+// the tree structure created here, will appendto to treehtml which is sent as params
+Tree.prototype.createTreeHTML = function(tree, treehtml) {
+  var li = document.createElement('li');
+  // span for tag node name
+  var name_span = document.createElement('span');
+  name_span.title = 'Tag';
+  name_span.innerHTML = tree.nodeName;
+  li.appendChild(name_span);
+  // span for id
+  var id = tree.id ? '<b>#</b>' + tree.id : '';
+  var name_span = document.createElement('span');
+  name_span.title = 'Id';
+  name_span.innerHTML = id;
+  li.appendChild(name_span);
+  // span for class
+  var className = tree.classList.length ? '<b>.</b>'+ tree.classList.join('.') : '';
+  var name_span = document.createElement('span');
+  name_span.title = 'Class';
+  name_span.innerHTML = className;
+  li.appendChild(name_span);
+  
+  // append li in the treehtml
+  treehtml.appendChild(li);
+  // if tree node has children, the function will iterate recursively and children will be created
+  if(tree.children.length){
+    // subtree, ul is created and append to parent li
+    var subtree = document.createElement('ul');
+    li.appendChild(subtree);
+    for (var i = 0, length = tree.children.length; i < length; i++) {
+      // ul subtree is sent as treehtml along with children
+      // another subtree will be created and will append to parent html using subtree
+      this.createTreeHTML(tree.children[i], subtree)
+    }
+  }
+  else{
+    // if no child found, then it return to append another nodes
+    return true;
+  }
+
+};
+// global tree object is set for testing and demo
 var tree = new Tree();
+
+// final method that build tree and creates modal on html
 function showHTMLTREE() {
-  var n =  tree.createNodesTree(document);
-  tree._root = n;
-    // tree._root = n;
-  createModal(n);
+  var top_node =  tree.createNodesTree(document);
+  tree._root = top_node;
+  createModal(tree);
 }
+
+
+(function () {
+  showHTMLTREE();
+})();
 
 function showModal(){
   var modal = document.getElementById('tree_modal');
   modal.style.display = 'block';
 }
-
-(function () {
-  showHTMLTREE();
-})();
