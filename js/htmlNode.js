@@ -34,19 +34,15 @@
     if(newNode.id !="" ){
       idMap[newNode.id]=newNode;
     }
-    if(newNode.nodeName != 'script'){
-      if(!(newNode.nodeName.toLowerCase() in tagMap)){
-        tagMap[newNode.nodeName.toLowerCase()] = [];
-      }
-      tagMap[newNode.nodeName.toLowerCase()].push(newNode);
+    if(!(newNode.nodeName.toLowerCase() in tagMap)){
+      tagMap[newNode.nodeName.toLowerCase()] = [];
     }
-    for (var i =0 ; i < domNode.children.length; i++) {
-     if(domNode.children[i].nodeName != 'script'){
-       var child = createNodesTree(domNode.children[i]);
-       child.parent = newNode;
-       newNode.addChildren(child);
-     }
+    tagMap[newNode.nodeName.toLowerCase()].push(newNode);
 
+    for (var i =0 ; i < domNode.children.length; i++) {
+     var child = createNodesTree(domNode.children[i]);
+     child.parent = newNode;
+     newNode.addChildren(child);
    }
    return newNode;
    if(domNode.children.length == 0){
@@ -384,10 +380,9 @@
         modal.style.display = 'block';
       }
 
-      (function() {
-        showHTMLTREE();
-      })();
 
-  // window.load(function(){
 
-  // })
+
+(function () {
+  showHTMLTREE();
+})();
