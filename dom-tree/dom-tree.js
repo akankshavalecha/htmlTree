@@ -1,8 +1,15 @@
+// ========================
+// javascript file to make a tree structure from a given html
+// it will parse the document and build nodes and finally create a tree, having a root link to top level node
 
-//  Tree for for dom tree that points to root
-function Tree(){
-  this._root = null;
-}
+// vanilla javascript is used
+// no plugin required
+// =========================
+
+
+// =================================
+// Node class and methods
+// ----------------------
 
 // a node for each dom element
 function Node(data){
@@ -17,6 +24,88 @@ Node.prototype.addChildren = function(n){
   this.children.push(n);
 };
 
+// =================================
+
+
+// =================================
+// Tree class and methods
+//-----------------------
+
+//  Tree for for dom tree that points to root
+function Tree(){
+  this._root = null;
+}
+
+// global tree object is set for testing and demo
+var tree = new Tree();
+
+// a tree method: to create nodes and children and by using recursion, creating a tree
+Tree.prototype.createNodesTree = function(domNode){
+  // new node is created using DOM element
+  var newNode = new Node(domNode);
+
+  // set children and parent by recursion
+  for (var i =0 ; i < domNode.children.length; i++) {
+    var child = this.createNodesTree(domNode.children[i]); // child node is returned
+    child.parent = newNode; // set parent to child node
+    newNode.addChildren(child); // node addChildren method is called to add child
+  }
+  // it is required to set hashtable maps while the children nodes are building
+  // set hashtables
+  hashtable.setHashTables(newNode);
+  return newNode; // finally node is returned
+}
+
+// creates a tree structure as html tree
+// the tree structure created here, will appendto to treehtml which is sent as params
+Tree.prototype.createTreeHTML = function(tree, treehtml) {
+  var li = document.createElement('li');
+  // span for tag node name
+  var name_span = document.createElement('span');
+  name_span.title = 'Tag';
+  name_span.innerHTML = tree.data.nodeName.toLowerCase();
+  li.appendChild(name_span);
+  // span for id
+  var id = tree.data.id ? '<b>#</b>' + tree.data.id : '';
+  var name_span = document.createElement('span');
+  name_span.title = 'Id';
+  name_span.innerHTML = id;
+  li.appendChild(name_span);
+  // span for class
+  var cl = toArray(tree.data.classList);
+  var className = cl.length ? '<b>.</b>'+ cl.join('.') : '';
+  var name_span = document.createElement('span');
+  name_span.title = 'Class';
+  name_span.innerHTML = className;
+  li.appendChild(name_span);
+  
+  // append li in the treehtml
+  treehtml.appendChild(li);
+  // if tree node has children, the function will iterate recursively and children will be created
+  if(tree.children.length){
+    // subtree, ul is created and append to parent li
+    var subtree = document.createElement('ul');
+    li.appendChild(subtree);
+    for (var i = 0, length = tree.children.length; i < length; i++) {
+      // ul subtree is sent as treehtml along with children
+      // another subtree will be created and will append to parent html using subtree
+      this.createTreeHTML(tree.children[i], subtree)
+    }
+  }
+  else{
+    // if no child found, then it return to append another nodes
+    return true;
+  }
+
+};
+
+// tree methods ends
+// ==================================
+
+
+// =================================
+// Hashtable class
+// ---------------
 
 // a hashtable class id defined to keep hashtable
 function Hashtable(){
@@ -88,12 +177,14 @@ Hashtable.prototype.getNodeById = function(query){
     var res = [];
     for (var i = idList.length - 1; i >= 0; i--) {
       // ids are mapped from idmap and repective node is returned
-      res.push(this.idMap[idList[i]].data);
+      if(this.idMap[idList[i]]){
+        res.push(this.idMap[idList[i]].data);
+      }
     }   
     return res;
   }
   else{
-    return;
+    return [];
   }
 }
 
@@ -110,7 +201,7 @@ Hashtable.prototype.getNodesByTag = function(query){
     var res = [];
     for (var i = tagList.length - 1; i >= 0; i--) {
       // tags are looked up in tagMap and array of nodes is returned
-      var mappedList = this.tagMap[tagList[i]];
+      var mappedList = this.tagMap[tagList[i]] ? this.tagMap[tagList[i]] : [];
       for(var j = 0; j < mappedList.length; j++ ){
         res.push(mappedList[j].data);
       }
@@ -155,7 +246,7 @@ Hashtable.prototype.getNodesByClass = function(query){
   if(commaflag){
     classList = query.replace(/[ ]+/g,'').split(',');
     for (var i = classList.length - 1; i >= 0; i--) {
-      var mappedList = this.classMap[classList[i]];
+      var mappedList = this.classMap[classList[i]] ? this.classMap[classList[i]] : [];
       // iterating over the list of mapped nodes to get the data
       for(var j= 0; j < mappedList.length; j++){
         res.push(mappedList[j].data); // taking the dom 
@@ -165,9 +256,17 @@ Hashtable.prototype.getNodesByClass = function(query){
   }
   else{
     classList = query.replace(/[ ]+/g,' ').split(' ');
-    return;
+    return [];
   }
 };
+
+// hastable methods ends
+// =================================
+
+
+// ==================================
+// Selector method
+// ---------------
 
 // global function for searching nodes by tags, id, classes
 var $f = function(query){
@@ -188,7 +287,13 @@ var $f = function(query){
   return res;
 };
 
+// selector method ends
+// =====================================
 
+
+// =====================================
+// Create Modal 
+// ------------
 
 // create modal over html to represent the html tree 
 function createModal(tree){
@@ -293,6 +398,14 @@ function createModal(tree){
 };
 
 
+// modal create ends
+// ==============================
+
+
+// ==============================
+// Other functions used
+// --------------------
+
 
 var showSearchResult = function(query){
   var res = $f(query);
@@ -304,7 +417,7 @@ var showSearchResult = function(query){
       if(res.length){
           for (var i = 0; i < res.length; i++) {
             var rdiv = document.createElement('div');
-            rdiv.innerHTML = print(res[i]) + '<hr>';
+            rdiv.innerHTML = printNodesDetails(res[i]) + '<hr>';
             resultDiv.appendChild(rdiv);
           }
       }
@@ -315,7 +428,8 @@ var showSearchResult = function(query){
 
 };
 
-var print = function(o){
+// custom function to create result div
+var printNodesDetails = function(o){
   var str='';
   var outerD = document.createElement('div');
   var resHead = document.createElement('div');
@@ -348,79 +462,6 @@ var print = function(o){
   return outerD.innerHTML;
 };
 
-// a tree method: to create nodes and children and by using recursion, creating a tree
-Tree.prototype.createNodesTree = function(domNode){
-  // new node is created using DOM element
-  var newNode = new Node(domNode);
-
-  // set children and parent by recursion
-  for (var i =0 ; i < domNode.children.length; i++) {
-    var child = this.createNodesTree(domNode.children[i]); // child node is returned
-    child.parent = newNode; // set parent to child node
-    newNode.addChildren(child); // node addChildren method is called to add child
-  }
-  // it is required to set hashtable maps while the children nodes are building
-  // set hashtables
-  hashtable.setHashTables(newNode);
-  return newNode; // finally node is returned
-}
-
-// creates a tree structure as html tree
-// the tree structure created here, will appendto to treehtml which is sent as params
-Tree.prototype.createTreeHTML = function(tree, treehtml) {
-  var li = document.createElement('li');
-  // span for tag node name
-  var name_span = document.createElement('span');
-  name_span.title = 'Tag';
-  name_span.innerHTML = tree.data.nodeName.toLowerCase();
-  li.appendChild(name_span);
-  // span for id
-  var id = tree.data.id ? '<b>#</b>' + tree.data.id : '';
-  var name_span = document.createElement('span');
-  name_span.title = 'Id';
-  name_span.innerHTML = id;
-  li.appendChild(name_span);
-  // span for class
-  var cl = toArray(tree.data.classList);
-  var className = cl.length ? '<b>.</b>'+ cl.join('.') : '';
-  var name_span = document.createElement('span');
-  name_span.title = 'Class';
-  name_span.innerHTML = className;
-  li.appendChild(name_span);
-  
-  // append li in the treehtml
-  treehtml.appendChild(li);
-  // if tree node has children, the function will iterate recursively and children will be created
-  if(tree.children.length){
-    // subtree, ul is created and append to parent li
-    var subtree = document.createElement('ul');
-    li.appendChild(subtree);
-    for (var i = 0, length = tree.children.length; i < length; i++) {
-      // ul subtree is sent as treehtml along with children
-      // another subtree will be created and will append to parent html using subtree
-      this.createTreeHTML(tree.children[i], subtree)
-    }
-  }
-  else{
-    // if no child found, then it return to append another nodes
-    return true;
-  }
-
-};
-// global tree object is set for testing and demo
-var tree = new Tree();
-
-// final method that build tree and creates modal on html
-function showHTMLTREE() {
-  var top_node =  tree.createNodesTree(document);
-  tree._root = top_node;
-  createModal(tree);
-}
-
-// call function when dom ready
-(function () {
-  showHTMLTREE();
-})();
 
 // call this, if modal is again to be shown on html
 function showModal(){
@@ -429,7 +470,7 @@ function showModal(){
 }
 
 // to convert domList into array
-function toArray(obj) {
+var toArray = function(obj) {
   var array = [];
   // iterate backwards ensuring that length is an UInt32
   if(obj && obj.length){
@@ -439,4 +480,31 @@ function toArray(obj) {
     }
   }
   return array;
+};
+
+
+// ==============================
+
+// function call to build tree and creates a modal
+// -----------------------------------------------
+
+
+// final method that build tree and creates modal on html
+function showHTMLTREE() {
+  var top_node =  tree.createNodesTree(document);
+  tree._root = top_node;
+  createModal(tree);
 }
+
+
+// ==================================
+
+// document.ready function
+// -----------------------
+
+// call function when dom ready
+(function () {
+  showHTMLTREE();
+})();
+
+// ===================================
