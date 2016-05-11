@@ -120,3 +120,7 @@ hr {
 	list-style-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/4621/treehouse-marker.png);
 }
 .text-center{text-align: center;}
+
+@media only screen and (max-width: 960px){
+	.col-6{width: 90%;}
+}

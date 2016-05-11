@@ -177,12 +177,14 @@ Hashtable.prototype.getNodeById = function(query){
     var res = [];
     for (var i = idList.length - 1; i >= 0; i--) {
       // ids are mapped from idmap and repective node is returned
-      res.push(this.idMap[idList[i]].data);
+      if(this.idMap[idList[i]]){
+        res.push(this.idMap[idList[i]].data);
+      }
     }   
     return res;
   }
   else{
-    return;
+    return [];
   }
 }
 
@@ -199,7 +201,7 @@ Hashtable.prototype.getNodesByTag = function(query){
     var res = [];
     for (var i = tagList.length - 1; i >= 0; i--) {
       // tags are looked up in tagMap and array of nodes is returned
-      var mappedList = this.tagMap[tagList[i]];
+      var mappedList = this.tagMap[tagList[i]] ? this.tagMap[tagList[i]] : [];
       for(var j = 0; j < mappedList.length; j++ ){
         res.push(mappedList[j].data);
       }
@@ -244,7 +246,7 @@ Hashtable.prototype.getNodesByClass = function(query){
   if(commaflag){
     classList = query.replace(/[ ]+/g,'').split(',');
     for (var i = classList.length - 1; i >= 0; i--) {
-      var mappedList = this.classMap[classList[i]];
+      var mappedList = this.classMap[classList[i]] ? this.classMap[classList[i]] : [];
       // iterating over the list of mapped nodes to get the data
       for(var j= 0; j < mappedList.length; j++){
         res.push(mappedList[j].data); // taking the dom 
@@ -254,7 +256,7 @@ Hashtable.prototype.getNodesByClass = function(query){
   }
   else{
     classList = query.replace(/[ ]+/g,' ').split(' ');
-    return;
+    return [];
   }
 };
 
