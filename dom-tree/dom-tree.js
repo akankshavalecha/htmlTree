@@ -6,9 +6,6 @@ function Tree(){
 
 // a node for each dom element
 function Node(data){
-  this.nodeName = '';
-  this.classList = [];
-  this.id = '';
   this.data = data;
   this.children = [];
   this.parent = null;
@@ -20,16 +17,6 @@ Node.prototype.addChildren = function(n){
   this.children.push(n);
 };
 
-// to set classList, id and nodeName to node
-Node.prototype.setValues = function(domNode){
-  this.nodeName = domNode.nodeName.toLowerCase();
-  if(domNode.className != null){
-    if(domNode.className != ''){
-      this.classList = (domNode.className).split(" ");
-    }
-  }
-  this.id = domNode.id;
-};
 
 // a hashtable class id defined to keep hashtable
 function Hashtable(){
@@ -46,24 +33,25 @@ var hashtable = new Hashtable();
 // it sets nodes in idMap, tagMap and classMap Hashtables
 Hashtable.prototype.setHashTables = function(node){
   // set tagMap
-  if(!(node.nodeName.toLowerCase() in this.tagMap)){
-    this.tagMap[node.nodeName.toLowerCase()] = [];
+  if(!(node.data.nodeName.toLowerCase() in this.tagMap)){
+    this.tagMap[node.data.nodeName.toLowerCase()] = [];
   }
-  this.tagMap[node.nodeName.toLowerCase()].push(node);
+  this.tagMap[node.data.nodeName.toLowerCase()].push(node);
 
   // set classMap
-  if(node.classList.length){
-    for (var i = 0; i < node.classList.length; i++) {
-      if(!(node.classList[i].toLowerCase() in this.classMap)){
-        this.classMap[node.classList[i].toLowerCase()] = [];
+  if(node.data.classList){
+    var nClassList = toArray(node.data.classList);
+    for (var i = 0; i < nClassList.length; i++) {
+      if(!(nClassList[i].toLowerCase() in this.classMap)){
+        this.classMap[nClassList[i].toLowerCase()] = [];
       }
-      this.classMap[node.classList[i].toLowerCase()].push(node);
+      this.classMap[nClassList[i].toLowerCase()].push(node);
     }
   }
 
   // set idMap
   if(node.id !="" ){
-    this.idMap[node.id] = node;
+    this.idMap[node.data.id] = node;
   }
   
 };
@@ -168,6 +156,7 @@ Hashtable.prototype.getNodesByClass = function(query){
     classList = query.replace(/[ ]+/g,'').split(',');
     for (var i = classList.length - 1; i >= 0; i--) {
       var mappedList = this.classMap[classList[i]];
+      // iterating over the list of mapped nodes to get the data
       for(var j= 0; j < mappedList.length; j++){
         res.push(mappedList[j].data); // taking the dom 
       }
@@ -182,6 +171,8 @@ Hashtable.prototype.getNodesByClass = function(query){
 
 // global function for searching nodes by tags, id, classes
 var $f = function(query){
+  // converting the query to lowercase
+  query = query.toLowerCase();
   var res = null;
   // calls the hashtable method according to the specifier
   if(query.charAt(0) === '.'){
@@ -327,6 +318,10 @@ var showSearchResult = function(query){
 var print = function(o){
   var str='';
   var outerD = document.createElement('div');
+  var resHead = document.createElement('div');
+  resHead.innerHTML = '<b>'+o.nodeName+'</b>';
+  outerD.appendChild(resHead);
+
   for(var p in o){
     var innerD = document.createElement('span');
     if(p === 'id'){
@@ -357,9 +352,6 @@ var print = function(o){
 Tree.prototype.createNodesTree = function(domNode){
   // new node is created using DOM element
   var newNode = new Node(domNode);
-  // set values to node
-  newNode.setValues(domNode);
-  // set hashtables
 
   // set children and parent by recursion
   for (var i =0 ; i < domNode.children.length; i++) {
@@ -368,6 +360,7 @@ Tree.prototype.createNodesTree = function(domNode){
     newNode.addChildren(child); // node addChildren method is called to add child
   }
   // it is required to set hashtable maps while the children nodes are building
+  // set hashtables
   hashtable.setHashTables(newNode);
   return newNode; // finally node is returned
 }
@@ -379,16 +372,17 @@ Tree.prototype.createTreeHTML = function(tree, treehtml) {
   // span for tag node name
   var name_span = document.createElement('span');
   name_span.title = 'Tag';
-  name_span.innerHTML = tree.nodeName;
+  name_span.innerHTML = tree.data.nodeName.toLowerCase();
   li.appendChild(name_span);
   // span for id
-  var id = tree.id ? '<b>#</b>' + tree.id : '';
+  var id = tree.data.id ? '<b>#</b>' + tree.data.id : '';
   var name_span = document.createElement('span');
   name_span.title = 'Id';
   name_span.innerHTML = id;
   li.appendChild(name_span);
   // span for class
-  var className = tree.classList.length ? '<b>.</b>'+ tree.classList.join('.') : '';
+  var cl = toArray(tree.data.classList);
+  var className = cl.length ? '<b>.</b>'+ cl.join('.') : '';
   var name_span = document.createElement('span');
   name_span.title = 'Class';
   name_span.innerHTML = className;
@@ -423,22 +417,26 @@ function showHTMLTREE() {
   createModal(tree);
 }
 
-
+// call function when dom ready
 (function () {
   showHTMLTREE();
 })();
 
+// call this, if modal is again to be shown on html
 function showModal(){
   var modal = document.getElementById('tree_modal');
   modal.style.display = 'block';
 }
 
-
+// to convert domList into array
 function toArray(obj) {
   var array = [];
   // iterate backwards ensuring that length is an UInt32
-  for (var i = obj.length >>> 0; i--;) { 
-    array[i] = obj[i];
+  if(obj && obj.length){
+
+    for (var i = obj.length >>> 0; i--;) { 
+      array[i] = obj[i];
+    }
   }
   return array;
 }
