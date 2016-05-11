@@ -17,6 +17,12 @@ A modal, that represents this tree structure is injected into the html page usin
 
 Download the dom-tree.js and modal.css and includes these in any html page.
 
+### Demo
+
+http://akankshavalecha.github.io/htmlTree
+
+index.html is a template, used as demo here, that includes github raw dom-tree.js and modal.css files 
+
 
 
 ### Plugins
