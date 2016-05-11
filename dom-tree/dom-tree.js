@@ -97,10 +97,10 @@ Hashtable.prototype.getNodeById = function(query){
   
   if(commaflag){
     idList = query.replace(/[ ]+/g,'').split(',');
-    var res = {};
+    var res = [];
     for (var i = idList.length - 1; i >= 0; i--) {
       // ids are mapped from idmap and repective node is returned
-      res[idList[i]] = this.idMap[idList[i]];
+      res.push(this.idMap[idList[i]].data);
     }   
     return res;
   }
@@ -119,28 +119,29 @@ Hashtable.prototype.getNodesByTag = function(query){
   // for comma separated tags
   if(commaflag){
     tagList = query.replace(/[ ]+/g,'').split(',');
-    var res = {};
+    var res = [];
     for (var i = tagList.length - 1; i >= 0; i--) {
       // tags are looked up in tagMap and array of nodes is returned
-      res[tagList[i]] = this.tagMap[tagList[i]];
+      var mappedList = this.tagMap[tagList[i]];
+      for(var j = 0; j < mappedList.length; j++ ){
+        res.push(mappedList[j].data);
+      }
     }    
   }
   // for space seperated tags -> parent children
   // right to left check for tags
   if(!commaflag){
     tagList = query.replace(/[ ]+/g,' ').split(' ');
-    var res = {};
-    var resList = [];
+    var res = [];
     var currentTag = tagList[tagList.length - 1];
     var filtredTagList = this.tagMap[currentTag] ? this.tagMap[currentTag] : [];
     for (var i = 0; i < filtredTagList.length; i++) {
       // console.log(filtredTagList[i])
       var flag = searchTag(filtredTagList[i], tagList);
       if(flag){
-        resList.push(filtredTagList[i]); 
+        res.push(filtredTagList[i].data); 
       }
     } 
-    res[currentTag] = resList;
   }
   return res;
 }
@@ -162,11 +163,14 @@ Hashtable.prototype.getNodesByClass = function(query){
   // query is processed for comma seperation ids, or spaces seperated
   commaflag = this.cleanQuery(query);
   
+  var res = [];
   if(commaflag){
     classList = query.replace(/[ ]+/g,'').split(',');
-    var res = {};
     for (var i = classList.length - 1; i >= 0; i--) {
-      res[classList[i]] = this.classMap[classList[i]];
+      var mappedList = this.classMap[classList[i]];
+      for(var j= 0; j < mappedList.length; j++){
+        res.push(mappedList[j].data); // taking the dom 
+      }
     }   
     return res;
   }
@@ -306,22 +310,13 @@ var showSearchResult = function(query){
     resultDiv.className = 'results';
     // res is a object of array when query is for class or tag
     // res is a object of node when query is for id
-    for(item in res){
-      if(res[item]){
-        if(Array.isArray(res[item])){
-          for (var i = 0; i < res[item].length; i++) {
+      if(res.length){
+          for (var i = 0; i < res.length; i++) {
             var rdiv = document.createElement('div');
-            rdiv.innerHTML = print(res[item][i]) + '<hr>';
-            resultDiv.appendChild(rdiv)
+            rdiv.innerHTML = print(res[i]) + '<hr>';
+            resultDiv.appendChild(rdiv);
           }
-        }
-        else{
-          var rdiv = document.createElement('div');
-          rdiv.innerHTML = print(res[item]) + '<hr>';
-          resultDiv.appendChild(rdiv)
-        }
       }
-    }
 
   if(!(resultDiv.hasChildNodes())){
     resultDiv.innerHTML = 'No Results';
@@ -334,11 +329,12 @@ var print = function(o){
   var outerD = document.createElement('div');
   for(var p in o){
     var innerD = document.createElement('span');
-    if(typeof o[p] == 'string'){
+    if(p === 'id'){
      var v = o[p].length ? o[p] : null;
      innerD.innerHTML = p + ': ' + v +'; </br>';
+
     }
-    else if(p === 'parent'){
+    else if(p === 'parentElement'){
       // innerD.innerHTML = p + ': { </br>' + print(o + '}';
       var par = o[p] ? o[p].nodeName : null;
       innerD.innerHTML = p + ': ' + par  + '; </br>';
@@ -348,7 +344,7 @@ var print = function(o){
       innerD.innerHTML = p + ': '+ c + '; </br>';
     }
     if( p === 'classList'){
-      var className = o.classList.length ? o.classList.join(', ') : null; 
+      var className = o.classList.length ? toArray(o.classList).join(', ') : null; 
       innerD.innerHTML ='class: '+ className + '; </br>';
     }
       outerD.appendChild(innerD);
@@ -435,4 +431,14 @@ function showHTMLTREE() {
 function showModal(){
   var modal = document.getElementById('tree_modal');
   modal.style.display = 'block';
+}
+
+
+function toArray(obj) {
+  var array = [];
+  // iterate backwards ensuring that length is an UInt32
+  for (var i = obj.length >>> 0; i--;) { 
+    array[i] = obj[i];
+  }
+  return array;
 }
