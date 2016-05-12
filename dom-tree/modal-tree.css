@@ -1,6 +1,6 @@
 /* The Modal (background) */
 .modal {
-	display: block; /* Hidden by default */
+	display: none; /* Hidden by default */
 	position: fixed; /* Stay in place */
 	z-index: 1; /* Sit on top */
 	padding-top: 65px; /* Location of the box */
@@ -95,8 +95,8 @@
 }
 #resultDiv.results {
 	border-color: #3c763d;
-	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #3c763d;
-	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #3c763d;
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 3px #595;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 3px #595;
 	margin: 10px auto;
 	padding: 20px;
 	transition: all 0.5s ease-in-out 0s;
@@ -118,6 +118,10 @@ hr {
 .modal .modal-content ul{
 	line-height: 1.5em;
 	list-style-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/4621/treehouse-marker.png);
+}
+.modal .modal-content ul li{
+    border-left: 1px dashed #ccc;
+    padding: 0 5px;
 }
 .text-center{text-align: center;}
 

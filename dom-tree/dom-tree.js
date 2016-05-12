@@ -274,7 +274,7 @@ var $f = function(query){
   query = query.toLowerCase();
   var res = null;
   // calls the hashtable method according to the specifier
-  if(query.charAt(0) === '.'){
+  if(query.charAt(0) === '.'){ 
     // if comma seperated query is there, then it removes all the . # to make a proper list of query
     res = hashtable.getNodesByClass(query.replace(/[.]+/g,''));
   }
@@ -295,11 +295,12 @@ var $f = function(query){
 // Create Modal 
 // ------------
 
-// create modal over html to represent the html tree 
-function createModal(tree){
+// custom modal for html
+// pass id to create modal
+var createhtmlModal = function(id){
   // Get the modal
   var modal = document.createElement('div');
-  modal.id = 'tree_modal';
+  modal.id = id;
   modal.className = 'modal';
   document.body.appendChild(modal);
   // Now create modal-content and append to modal
@@ -314,6 +315,16 @@ function createModal(tree){
   sp.innerHTML = 'X';
   sp.title = 'Close';
   modal_content.appendChild(sp);
+  return;
+}
+
+// create modal over html to represent the html tree 
+function createModal(tree){
+  // modal is created by calling create htmlModal
+  createhtmlModal('tree_modal');
+  modal = document.getElementById('tree_modal');
+  modal.style.display = 'block';
+  modal_content = document.getElementsByClassName('modal-content')[0];
 
   // modal header is created and append to modal-content
   var modal_header = document.createElement('h2');
@@ -356,6 +367,9 @@ function createModal(tree){
   inputs.addEventListener("keyup", function(e){
     if(e.keyCode === 13){
       // on hit enter search query and show results
+      showSearchResult(this.value);
+    }
+    if(!this.value.length){
       showSearchResult(this.value);
     }
   });
@@ -422,7 +436,7 @@ var showSearchResult = function(query){
           }
       }
 
-  if(!(resultDiv.hasChildNodes())){
+  if(!(resultDiv.hasChildNodes()) || !query.length){
     resultDiv.innerHTML = 'No Results';
   }
 
