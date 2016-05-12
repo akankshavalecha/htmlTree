@@ -42,18 +42,23 @@ var tree = new Tree();
 // a tree method: to create nodes and children and by using recursion, creating a tree
 Tree.prototype.createNodesTree = function(domNode){
   // new node is created using DOM element
+    if(domNode.nodeName.toLowerCase() != 'iframe' && domNode.nodeName.toLowerCase() != 'script' && domNode.nodeName.toLowerCase() != 'noscript'){
   var newNode = new Node(domNode);
 
   // set children and parent by recursion
   for (var i =0 ; i < domNode.children.length; i++) {
     var child = this.createNodesTree(domNode.children[i]); // child node is returned
+    if(child){
+      
     child.parent = newNode; // set parent to child node
     newNode.addChildren(child); // node addChildren method is called to add child
+    }
   }
   // it is required to set hashtable maps while the children nodes are building
   // set hashtables
   hashtable.setHashTables(newNode);
   return newNode; // finally node is returned
+    }
 }
 
 // creates a tree structure as html tree
@@ -85,11 +90,15 @@ Tree.prototype.createTreeHTML = function(tree, treehtml) {
   if(tree.children.length){
     // subtree, ul is created and append to parent li
     var subtree = document.createElement('ul');
+    subtree.className = 'modal_tree_ul';
     li.appendChild(subtree);
     for (var i = 0, length = tree.children.length; i < length; i++) {
       // ul subtree is sent as treehtml along with children
       // another subtree will be created and will append to parent html using subtree
-      this.createTreeHTML(tree.children[i], subtree)
+      if(tree.children[i].data){
+        // console.log('subtree', subtree)
+        this.createTreeHTML(tree.children[i], subtree)
+      }
     }
   }
   else{
@@ -300,7 +309,7 @@ var $f = function(query){
 var createhtmlModal = function(id){
   // Get the modal
   var modal = document.createElement('div');
-  modal.id = id;
+  modal.id = 'tree_modal';
   modal.className = 'modal';
   document.body.appendChild(modal);
   // Now create modal-content and append to modal
@@ -321,10 +330,26 @@ var createhtmlModal = function(id){
 // create modal over html to represent the html tree 
 function createModal(tree){
   // modal is created by calling create htmlModal
-  createhtmlModal('tree_modal');
-  modal = document.getElementById('tree_modal');
+  var modal = document.createElement('div');
+  modal.id = 'tree_modal';
+  modal.className = 'modal';
+  document.body.appendChild(modal);
+  // Now create modal-content and append to modal
+  var modal_content = document.createElement('div');
+  modal_content.className = 'modal-content';
+  modal_content.id = 'treeModalContent';
+  modal.appendChild(modal_content);
+
+
+  // close span is created and append to modal-content to close modal
+  var sp = document.createElement('span');
+  sp.className = 'close' ;
+  sp.innerHTML = 'X';
+  sp.title = 'Close';
+  modal_content.appendChild(sp);
+  // modal = document.getElementById('tree_modal');
   modal.style.display = 'block';
-  modal_content = document.getElementsByClassName('modal-content')[0];
+  // modal_content = document.getElementsByClassName('modal-content')[0];
 
   // modal header is created and append to modal-content
   var modal_header = document.createElement('h2');
@@ -337,11 +362,13 @@ function createModal(tree){
   first_column.className = 'col-6';
   // ul is created and append to first column of modal-content to show tree
   var treehtml = document.createElement('ul');
+  treehtml.id = 'modal-tree-list';
+  treehtml.className = 'modal_tree_ul';
+  // tree is append to first_column of modal-content
+  first_column.appendChild(treehtml);
 
   // tree method is called to get html format of tree
   tree.createTreeHTML(tree._root, treehtml);
-  // tree is append to first_column of modal-content
-  first_column.appendChild(treehtml);
 
   // first column is appended to modal-content
   modal_content.appendChild(first_column);
